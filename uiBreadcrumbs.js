@@ -7,41 +7,50 @@
  */
 
 
-(function() {
+(function () {
 
-    /**
-     * Config
-     */
-    var moduleName = 'angularUtils.directives.uiBreadcrumbs';
-    var templateUrl = 'directives/uiBreadcrumbs/uiBreadcrumbs.tpl.html';
+        /**
+         * Config
+         */
+        var moduleName = 'angularUtils.directives.uiBreadcrumbs';
+        var templateUrl = 'directives/uiBreadcrumbs/uiBreadcrumbs.tpl.html';
 
-    /**
-     * Module
-     */
-    var module;
-    try {
-        module = angular.module(moduleName);
-    } catch(err) {
-        // named module does not exist, so create one
-        module = angular.module(moduleName, ['ui.router']);
-    }
+        /**
+         * Module
+         */
+        var module;
+        try {
+            module = angular.module(moduleName);
+        } catch (err) {
+            // named module does not exist, so create one
+            module = angular.module(moduleName, ['ui.router']);
+        }
 
-    module.directive('uiBreadcrumbs', ['$interpolate', '$state', function($interpolate, $state) {
+        module.directive('uiBreadcrumbs', uiBreadcrumbs);
+
+        uiBreadcrumbs.$inject = ['$interpolate', '$state', '$transitions'];
+
+        function uiBreadcrumbs($interpolate, $state, $transitions) {
             return {
                 restrict: 'E',
-                templateUrl: function(elem, attrs) {
+                templateUrl: function (elem, attrs) {
                     return attrs.templateUrl || templateUrl;
                 },
                 scope: {
                     displaynameProperty: '@',
                     abstractProxyProperty: '@?'
                 },
-                link: function(scope) {
+                link: function (scope) {
                     scope.breadcrumbs = [];
                     if ($state.$current.name !== '') {
                         updateBreadcrumbsArray();
                     }
-                    scope.$on('$stateChangeSuccess', function() {
+                    // scope.$on('$stateChangeSuccess', function () {
+                    //     updateBreadcrumbsArray();
+                    // });
+
+                    $transitions.onSuccess({}, function (_transition) {
+                        transition = _transition;
                         updateBreadcrumbsArray();
                     });
 
@@ -55,7 +64,7 @@
                         var breadcrumbs = [];
                         var currentState = $state.$current;
 
-                        while(currentState && currentState.name !== '') {
+                        while (currentState && currentState.name !== '') {
                             workingState = getWorkingState(currentState);
                             if (workingState) {
                                 displayName = getDisplayName(workingState);
@@ -125,7 +134,7 @@
                             return currentState.name;
                         } else {
                             // use the $interpolate service to handle any bindings in the propertyReference string.
-                            interpolationContext =  (typeof currentState.locals !== 'undefined') ? currentState.locals.globals : currentState;
+                            interpolationContext = (typeof currentState.locals !== 'undefined') ? currentState.locals.globals : currentState;
                             displayName = $interpolate(propertyReference)(interpolationContext);
                             return displayName;
                         }
@@ -144,7 +153,7 @@
                         var propertyArray = objectPath.split('.');
                         var propertyReference = context;
 
-                        for (i = 0; i < propertyArray.length; i ++) {
+                        for (i = 0; i < propertyArray.length; i++) {
                             if (angular.isDefined(propertyReference[propertyArray[i]])) {
                                 propertyReference = propertyReference[propertyArray[i]];
                             } else {
@@ -165,7 +174,7 @@
                     function stateAlreadyInBreadcrumbs(state, breadcrumbs) {
                         var i;
                         var alreadyUsed = false;
-                        for(i = 0; i < breadcrumbs.length; i++) {
+                        for (i = 0; i < breadcrumbs.length; i++) {
                             if (breadcrumbs[i].route === state.name) {
                                 alreadyUsed = true;
                             }
@@ -174,5 +183,5 @@
                     }
                 }
             };
-        }]);
+        });
 })();

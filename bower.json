@@ -1,7 +1,7 @@
 {
   "name": "angular-utils-ui-breadcrumbs",
-  "version": "0.2.2",
-  "homepage": "https://github.com/michaelbromley/angularUtils/tree/master/src/directives/uiBreadcrumbs",
+  "version": "0.2.3",
+  "homepage": "https://github.com/sandscap-sc/angularUtils-uiBreadcrumbs",
   "authors": [
     "Michael Bromley <michael@michaelbromley.co.uk>"
   ],
